@@ -5,7 +5,7 @@ migrate-up:
 	migrate -path $(MIGRATIONS_DIR) -database "$(DB_URL)" up
 
 migrate-down:
-	migrate -path $(MIGRATIONS_DIR) -database "$(DB_URL)" down 1
+	migrate -path $(MIGRATIONS_DIR) -database "$(DB_URL)" down
 
 migrate-drop:
 	migrate -path $(MIGRATIONS_DIR) -database "$(DB_URL)" drop -f

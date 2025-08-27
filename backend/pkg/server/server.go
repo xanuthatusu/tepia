@@ -13,6 +13,7 @@ import (
 	"github.com/xanuthatusu/tepia/internal/api"
 	"github.com/xanuthatusu/tepia/internal/db"
 	"github.com/xanuthatusu/tepia/internal/middleware"
+	"github.com/xanuthatusu/tepia/internal/sessions"
 )
 
 type ServerConfig struct {
@@ -51,6 +52,8 @@ func New() *Server {
 }
 
 func (s *Server) Start() error {
+	sessions.Init()
+
 	pool := db.Connect()
 	defer pool.Close()
 
@@ -61,6 +64,7 @@ func (s *Server) Start() error {
 	r.Use(middleware.CORS())
 
 	api.RegisterRoutes(r, pool)
+	api.RegisterAuthRoutes(r, pool)
 
 	srv := &http.Server{
 		Addr:    s.Config.Addr + ":" + s.Config.Port,

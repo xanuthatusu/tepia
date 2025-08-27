@@ -8,32 +8,23 @@ import (
 	"github.com/xanuthatusu/tepia/internal/models"
 )
 
-func CreateUser(ctx context.Context, pool *pgxpool.Pool, name, email string) (string, error) {
-	uuid := uuid.New()
+func CreateUserWithPassword(ctx context.Context, pool *pgxpool.Pool, name, email, hash string) error {
 	if _, err := pool.Exec(ctx,
-		"INSERT INTO users (id, name, email) VALUES ($1, $2, $3)",
-		uuid, name, email); err != nil {
-		return "", err
+		"INSERT INTO users (id, name, email, pass_hash) VALUES ($1, $2, $3, $4)",
+		uuid.New(), name, email, hash); err != nil {
+		return err
 	}
 
-	return uuid.String(), nil
+	return nil
 }
 
-func ListUsers(ctx context.Context, pool *pgxpool.Pool) ([]models.User, error) {
-	rows, err := pool.Query(ctx, "SELECT id, name, email FROM users")
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
+func GetUserByEmail(ctx context.Context, pool *pgxpool.Pool, email string) (models.User, error) {
+	row := pool.QueryRow(ctx, "SELECT id, name, email, pass_hash FROM users WHERE email = $1", email)
 
-	var users []models.User
-	for rows.Next() {
-		var u models.User
-		if err := rows.Scan(&u.ID, &u.Name, &u.Email); err != nil {
-			return nil, err
-		}
-		users = append(users, u)
+	var user models.User
+	if err := row.Scan(&user.ID, &user.Name, &user.Email, &user.Password); err != nil {
+		return models.User{}, err
 	}
 
-	return users, nil
+	return user, nil
 }

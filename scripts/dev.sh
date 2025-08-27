@@ -19,7 +19,7 @@ make -C backend migrate-up
 
 echo -e "${GREEN}> Starting backend...${NC}"
 cd backend
-DATABASE_URL="postgres://postgres:postgres@localhost:5432/tepia?sslmode=disable" air &
+SESSION_KEY="dvamvtklzvqvfllotjkdrnnhtoqcdosa" DATABASE_URL="postgres://postgres:postgres@localhost:5432/tepia?sslmode=disable" air &
 
 echo -e "${GREEN}> Starting frontend...${NC}"
 cd ../frontend
