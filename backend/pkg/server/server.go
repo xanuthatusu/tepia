@@ -11,6 +11,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/xanuthatusu/tepia/internal/api"
+	"github.com/xanuthatusu/tepia/internal/db"
 	"github.com/xanuthatusu/tepia/internal/middleware"
 )
 
@@ -50,13 +51,16 @@ func New() *Server {
 }
 
 func (s *Server) Start() error {
+	pool := db.Connect()
+	defer pool.Close()
+
 	r := gin.New()
 
 	r.Use(gin.Recovery())
 	r.Use(middleware.Logger())
 	r.Use(middleware.CORS())
 
-	api.RegisterRoutes(r)
+	api.RegisterRoutes(r, pool)
 
 	srv := &http.Server{
 		Addr:    s.Config.Addr + ":" + s.Config.Port,
